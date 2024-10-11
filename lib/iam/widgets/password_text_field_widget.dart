@@ -46,17 +46,21 @@ class _PasswordTextFieldWidgetState extends State<PasswordTextFieldWidget> {
         labelStyle: TextStyle(color: colors["color-main-green"]),
         focusedBorder: _buildBorder(),
         enabledBorder: _buildBorder(),
-        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isObscureText ? Icons.visibility : Icons.visibility_off,
-            color: colors["color-main-green"],
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: IconButton(
+            icon: Icon(
+              _isObscureText ? Icons.visibility : Icons.visibility_off,
+              color: colors["color-main-green"],
+            ),
+            onPressed: () {
+              setState(() {
+                _isObscureText = !_isObscureText;
+              });
+            },
           ),
-          onPressed: () {
-            setState(() {
-              _isObscureText = !_isObscureText;
-            });
-          },
         ),
       ),
     );
