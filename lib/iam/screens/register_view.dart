@@ -2,6 +2,7 @@ import 'package:ayni_mobile_app/iam/widgets/auth_text_field_widget.dart';
 import 'package:ayni_mobile_app/iam/widgets/password_text_field_widget.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -191,7 +192,9 @@ class _RegisterViewState extends State<RegisterView> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              context.goNamed("login_view");
+                            },
                             child: Text(
                               "Log in",
                               style: TextStyle(
