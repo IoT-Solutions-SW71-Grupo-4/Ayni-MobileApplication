@@ -6,4 +6,5 @@ const Map<String, Color> colors = {
   "color-white": Color(0xFFFFFFFF),
   "color-light-green": Color(0xFFDDFFE7),
   "color-50-black": Color(0x80000000),
+  "color-error-red": Color(0xFFF44336)
 };

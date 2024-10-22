@@ -18,6 +18,7 @@ class PasswordTextFieldWidget extends StatefulWidget {
 
 class _PasswordTextFieldWidgetState extends State<PasswordTextFieldWidget> {
   bool _isObscureText = true;
+  bool _hasErrors = false;
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -35,17 +36,36 @@ class _PasswordTextFieldWidgetState extends State<PasswordTextFieldWidget> {
     );
   }
 
+  OutlineInputBorder _buildErrorBorder() {
+    return OutlineInputBorder(
+      borderSide: BorderSide(color: colors["color-error-red"]!),
+      borderRadius: BorderRadius.circular(12),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
       obscureText: _isObscureText,
-      validator: _validatePassword,
+      validator: (value) {
+        final error = _validatePassword.call(value);
+        setState(() {
+          _hasErrors = error != null;
+        });
+        return error;
+      },
       decoration: InputDecoration(
         labelText: widget.labelText,
-        labelStyle: TextStyle(color: colors["color-main-green"]),
+        labelStyle: TextStyle(
+          color: _hasErrors
+              ? colors["color-error-red"]
+              : colors["color-main-green"],
+        ),
         focusedBorder: _buildBorder(),
         enabledBorder: _buildBorder(),
+        errorBorder: _buildErrorBorder(),
+        focusedErrorBorder: _buildErrorBorder(),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         suffixIcon: Padding(

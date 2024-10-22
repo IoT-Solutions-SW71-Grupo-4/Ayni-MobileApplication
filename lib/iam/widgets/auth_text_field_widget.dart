@@ -18,9 +18,18 @@ class AuthTextFieldWidget extends StatefulWidget {
 }
 
 class _AuthTextFieldWidgetState extends State<AuthTextFieldWidget> {
+  bool _hasErrors = false;
+
   OutlineInputBorder _buildBorder() {
     return OutlineInputBorder(
       borderSide: BorderSide(color: colors["color-main-green"]!),
+      borderRadius: BorderRadius.circular(12),
+    );
+  }
+
+  OutlineInputBorder _buildErrorBorder() {
+    return OutlineInputBorder(
+      borderSide: BorderSide(color: colors["color-error-red"]!),
       borderRadius: BorderRadius.circular(12),
     );
   }
@@ -29,13 +38,26 @@ class _AuthTextFieldWidgetState extends State<AuthTextFieldWidget> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      validator: widget.validator,
+      validator: (value) {
+        final error = widget.validator?.call(value);
+        setState(() {
+          _hasErrors = error != null;
+        });
+        return error;
+      },
       decoration: InputDecoration(
         labelText: widget.labelText,
-        labelStyle: TextStyle(color: colors["color-main-green"]),
+        labelStyle: TextStyle(
+          color: _hasErrors
+              ? colors["color-error-red"]
+              : colors["color-main-green"],
+        ),
         focusedBorder: _buildBorder(),
         enabledBorder: _buildBorder(),
-        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        errorBorder: _buildErrorBorder(),
+        focusedErrorBorder: _buildErrorBorder(),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       ),
     );
   }
