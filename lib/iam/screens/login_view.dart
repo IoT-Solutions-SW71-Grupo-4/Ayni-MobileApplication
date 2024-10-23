@@ -1,4 +1,5 @@
 import 'package:ayni_mobile_app/iam/widgets/auth_text_field_widget.dart';
+import 'package:ayni_mobile_app/iam/widgets/checkbox_widget.dart';
 import 'package:ayni_mobile_app/iam/widgets/password_text_field_widget.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,28 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  bool _isCheckedRememberMe = false;
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    // Verificar formato de correo electrónico
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null; // Si es válido, devuelve null
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      print("Login successful");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +58,18 @@ class _LoginViewState extends State<LoginView> {
                 ),
               ),
               Form(
+                key: _formKey,
                 child: Column(
                   children: [
                     SizedBox(
-                      height: 180,
+                      height: 190,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           AuthTextFieldWidget(
                             controller: _emailController,
                             labelText: "Email",
+                            validator: _validateEmail,
                           ),
                           PasswordTextFieldWidget(
                             controller: _passwordController,
@@ -55,24 +78,17 @@ class _LoginViewState extends State<LoginView> {
                         ],
                       ),
                     ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: true,
-                          onChanged: (bool? value) {},
-                          activeColor: colors["color-main-green"],
-                        ),
-                        Text(
-                          "Remember me",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: colors["color-50-black"],
-                          ),
-                        ),
-                      ],
+                    CheckboxWidget(
+                      value: _isCheckedRememberMe,
+                      onChanged: (bool? val) {
+                        setState(() {
+                          _isCheckedRememberMe = val!;
+                        });
+                      },
+                      text: "Remember me",
                     ),
                     ElevatedButton(
-                      onPressed: () => {},
+                      onPressed: _submitForm,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colors["color-main-green"],
                         padding: const EdgeInsets.symmetric(vertical: 16.0),

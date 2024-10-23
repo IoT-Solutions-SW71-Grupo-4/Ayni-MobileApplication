@@ -1,4 +1,5 @@
 import 'package:ayni_mobile_app/iam/widgets/auth_text_field_widget.dart';
+import 'package:ayni_mobile_app/iam/widgets/checkbox_widget.dart';
 import 'package:ayni_mobile_app/iam/widgets/password_text_field_widget.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +13,51 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  bool _areTermsAccepted = false;
+
+  String? _validatePersonalData(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a valid name.';
+    }
+    if (value.length < 3) {
+      return 'Name must be at least 3 characters.';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _confirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please confirm your password';
+    }
+    if (value != _passwordController.text) {
+      return "Please, confirm your password correctly";
+    }
+    return null;
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      print("Register successful");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +69,7 @@ class _RegisterViewState extends State<RegisterView> {
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,22 +86,26 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                 ),
                 Form(
+                  key: _formKey,
                   child: SizedBox(
-                    height: 540,
+                    height: 560,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         AuthTextFieldWidget(
                           controller: _firstNameController,
                           labelText: "First name",
+                          validator: _validatePersonalData,
                         ),
                         AuthTextFieldWidget(
                           controller: _lastnameController,
                           labelText: "Lastname",
+                          validator: _validatePersonalData,
                         ),
                         AuthTextFieldWidget(
                           controller: _emailController,
                           labelText: "Email",
+                          validator: _validateEmail,
                         ),
                         PasswordTextFieldWidget(
                           controller: _passwordController,
@@ -70,27 +114,19 @@ class _RegisterViewState extends State<RegisterView> {
                         PasswordTextFieldWidget(
                           controller: _confirmPasswordController,
                           labelText: "Confirm password",
+                          validator: _confirmPassword,
                         ),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: true,
-                              onChanged: (bool? value) {},
-                              activeColor: colors["color-main-green"],
-                            ),
-                            Expanded(
-                              child: Text(
-                                "I agree with Ayni's Terms & Conditions",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colors["color-50-black"],
-                                ),
-                              ),
-                            ),
-                          ],
+                        CheckboxWidget(
+                          value: _areTermsAccepted,
+                          onChanged: (bool? val) {
+                            setState(() {
+                              _areTermsAccepted = val!;
+                            });
+                          },
+                          text: "I agree with Ayni's Terms & Conditions",
                         ),
                         ElevatedButton(
-                          onPressed: () => {},
+                          onPressed: _areTermsAccepted ? _submitForm : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: colors["color-main-green"],
                             padding: const EdgeInsets.symmetric(vertical: 16.0),

@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 class PasswordTextFieldWidget extends StatefulWidget {
   final TextEditingController controller;
   final String labelText;
+  final String? Function(String?)? validator;
 
-  const PasswordTextFieldWidget({
-    super.key,
-    required this.controller,
-    required this.labelText,
-  });
+  const PasswordTextFieldWidget(
+      {super.key,
+      required this.controller,
+      required this.labelText,
+      this.validator});
 
   @override
   State<PasswordTextFieldWidget> createState() =>
@@ -21,6 +22,8 @@ class _PasswordTextFieldWidgetState extends State<PasswordTextFieldWidget> {
   bool _hasErrors = false;
 
   String? _validatePassword(String? value) {
+    if (widget.validator != null) return widget.validator!(value);
+
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
     } else if (value.length < 6) {
