@@ -27,6 +27,9 @@ class _CropsListWidgetState extends State<CropsListWidget> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
       builder: (context) => AddCropModal(),
     );
   }
