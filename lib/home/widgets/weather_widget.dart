@@ -15,7 +15,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
       decoration: BoxDecoration(
         color: colors["color-light-green"],
         borderRadius: BorderRadius.circular(6),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Color.fromRGBO(18, 18, 18, 0.25),
             offset: Offset(0, 4),
@@ -23,7 +23,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
           ),
         ],
       ),
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 28,
         vertical: 28,
       ),
@@ -31,48 +31,44 @@ class _WeatherWidgetState extends State<WeatherWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "20°",
-                  style: TextStyle(
-                    fontSize: 44,
-                    fontWeight: FontWeight.w900,
-                    color: colors["color-text-black"],
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "20°",
+                style: TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w900,
+                  color: colors["color-text-black"],
                 ),
-                Text(
-                  "Lima, Perú",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colors["color-text-black"],
-                  ),
+              ),
+              Text(
+                "Lima, Perú",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colors["color-text-black"],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Container(
-            child: Column(
-              children: [
-                Container(
-                  height: 84,
-                  width: 84,
-                  child: Image.asset(
-                    "assets/images/weather_icons/04d.png",
-                  ),
+          Column(
+            children: [
+              SizedBox(
+                height: 84,
+                width: 84,
+                child: Image.asset(
+                  "assets/images/weather_icons/04d.png",
                 ),
-                Text(
-                  "Cloudy",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colors["color-text-black"],
-                  ),
+              ),
+              Text(
+                "Cloudy",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colors["color-text-black"],
                 ),
-              ],
-            ),
-          )
+              ),
+            ],
+          ),
         ],
       ),
     );

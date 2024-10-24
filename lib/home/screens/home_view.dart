@@ -30,7 +30,7 @@ class _HomeViewState extends State<HomeView> {
                     Container(
                       height: 48,
                       width: 48,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xFFD9D9D9),
                         shape: BoxShape.circle,
                       ),
@@ -45,7 +45,7 @@ class _HomeViewState extends State<HomeView> {
                     Container(
                       height: 48,
                       width: 48,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xFFD9D9D9),
                         shape: BoxShape.circle,
                       ),
@@ -60,24 +60,22 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              Container(
-                child: Text(
-                  "Welcome, Aaron",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: colors["color-black"],
-                  ),
+              Text(
+                "Welcome, Aaron",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: colors["color-black"],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
-              WeatherWidget(),
-              SizedBox(
+              const WeatherWidget(),
+              const SizedBox(
                 height: 24,
               ),
-              CropsListWidget(),
+              const CropsListWidget(),
             ],
           ),
         ),

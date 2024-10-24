@@ -57,10 +57,10 @@ class _AddCropModalState extends State<AddCropModal> {
   }
 
   void _submitForm() {
-    Navigator.of(context).pop();
-    showSuccessBottomSheet(context);
-    // if (_formKey.currentState!.validate()) {
-    // }
+    if (_formKey.currentState!.validate()) {
+      Navigator.of(context).pop();
+      showSuccessBottomSheet(context);
+    }
   }
 
   @override
@@ -72,39 +72,37 @@ class _AddCropModalState extends State<AddCropModal> {
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context)
-                  .viewInsets
-                  .bottom, // Ajusta el padding según el teclado
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                const Text(
                   "Add new crop",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 StringFieldWidget(
                   controller: _cropNameController,
                   labelText: "Crop name",
                   validator: _validateCropName,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 NumberFieldWidget(
                   controller: _areaController,
                   labelText: "Area (Hectares)",
                   validator: _validateCropArea,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 DateFieldWidget(
                   controller: _plantingDateController,
                   labelText: "Planting date",
                   validator: _validatePlantingDate,
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
@@ -140,7 +138,7 @@ void showSuccessBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
     ),
     builder: (context) {
@@ -153,27 +151,27 @@ void showSuccessBottomSheet(BuildContext context) {
             Container(
               height: 48,
               width: 48,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.green,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.check,
                 color: Colors.white,
                 size: 26,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               "Success",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               "Crop successfully added!",
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: colors["color-main-green"],
@@ -182,7 +180,7 @@ void showSuccessBottomSheet(BuildContext context) {
                 ),
               ),
               onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el modal
+                Navigator.of(context).pop();
               },
               child: Text(
                 "Ok",

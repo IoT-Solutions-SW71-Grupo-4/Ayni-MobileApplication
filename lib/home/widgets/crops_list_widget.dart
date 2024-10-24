@@ -27,10 +27,10 @@ class _CropsListWidgetState extends State<CropsListWidget> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
-      builder: (context) => AddCropModal(),
+      builder: (context) => const AddCropModal(),
     );
   }
 
@@ -45,7 +45,7 @@ class _CropsListWidgetState extends State<CropsListWidget> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 12),
-                child: Container(
+                child: SizedBox(
                   height: 30,
                   width: 30,
                   child: Image.asset(
@@ -63,7 +63,7 @@ class _CropsListWidgetState extends State<CropsListWidget> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 18,
           ),
           Flexible(
@@ -130,15 +130,15 @@ class CropCardWidget extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: colors["color-white"],
-                      borderRadius: BorderRadius.all(
+                      borderRadius: const BorderRadius.all(
                         Radius.circular(50),
                       ),
                     ),
                   ),
-                ), // Espacio entre la imagen y el nombre
+                ),
                 Text(
                   cropName,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
