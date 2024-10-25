@@ -2,6 +2,7 @@ import 'package:ayni_mobile_app/home/widgets/crops_list_widget.dart';
 import 'package:ayni_mobile_app/home/widgets/weather_widget.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -54,7 +55,9 @@ class _HomeViewState extends State<HomeView> {
                           Icons.person,
                           color: colors["color-50-black"],
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          context.goNamed("profile_view");
+                        },
                       ),
                     ),
                   ],

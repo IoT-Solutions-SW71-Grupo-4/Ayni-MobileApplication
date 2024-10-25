@@ -1,5 +1,6 @@
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -29,7 +30,7 @@ class _ProfileViewState extends State<ProfileView> {
               color: colors["color-text-black"],
             ),
             onPressed: () {
-              Navigator.of(context).pop();
+              context.goNamed("home_view");
             },
           ),
         ),
