@@ -7,7 +7,7 @@ import 'package:ayni_mobile_app/profile/screens/profile_view.dart';
 import 'package:go_router/go_router.dart';
 
 final routes = GoRouter(
-  initialLocation: "/home",
+  initialLocation: "/login",
   routes: <GoRoute>[
     GoRoute(
       path: '/login',
