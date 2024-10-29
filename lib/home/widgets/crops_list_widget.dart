@@ -1,27 +1,21 @@
+import 'package:ayni_mobile_app/home/models/crop.dart';
 import 'package:ayni_mobile_app/home/widgets/new_crop_modal.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class CropsListWidget extends StatefulWidget {
-  const CropsListWidget({super.key});
+  final List<Crop> cropsList;
+
+  const CropsListWidget({super.key, required this.cropsList});
 
   @override
   State<CropsListWidget> createState() => _CropsListWidgetState();
 }
 
 class _CropsListWidgetState extends State<CropsListWidget> {
-  final List<Map<String, String>> _cropsList = [
-    {
-      "name": "Crop 1",
-    },
-    {
-      "name": "Crop 2",
-    },
-  ];
-
-  void _navigateToCropDetails(String cropName) {
-    context.goNamed("irrigation_view");
+  void _navigateToCropDetails(Crop crop) {
+    context.go("/home/irrigation/${crop.id}", extra: crop);
   }
 
   void _displayAddCropForm() {
@@ -74,17 +68,17 @@ class _CropsListWidgetState extends State<CropsListWidget> {
                 crossAxisSpacing: 12, // Espacio entre columnas
                 mainAxisSpacing: 12, // Espacio entre filas
               ),
-              itemCount: _cropsList.length + 1,
+              itemCount: widget.cropsList.length + 1,
               itemBuilder: (context, index) {
-                if (index < _cropsList.length) {
-                  final crop = _cropsList[index];
+                if (index < widget.cropsList.length) {
+                  final crop = widget.cropsList[index];
                   return CropCardWidget(
-                    cropName: crop["name"]!,
-                    onTap: () => _navigateToCropDetails(crop["name"]!),
+                    crop: crop,
+                    onTap: () => _navigateToCropDetails(crop),
                   );
                 } else {
                   return CropCardWidget(
-                    cropName: "Add crop",
+                    crop: Crop(id: 999, name: "Add crop"),
                     onTap: () => _displayAddCropForm(),
                   );
                 }
@@ -98,12 +92,12 @@ class _CropsListWidgetState extends State<CropsListWidget> {
 }
 
 class CropCardWidget extends StatelessWidget {
-  final String cropName;
+  final Crop crop;
   final VoidCallback onTap;
 
   const CropCardWidget({
     super.key,
-    required this.cropName,
+    required this.crop,
     required this.onTap,
   });
 
@@ -138,7 +132,7 @@ class CropCardWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  cropName,
+                  crop.name,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

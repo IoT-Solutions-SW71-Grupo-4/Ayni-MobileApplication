@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ayni_mobile_app/home/models/crop.dart';
 import 'package:ayni_mobile_app/irrigation/widgets/automatic_irrigation_control_widget.dart';
 import 'package:ayni_mobile_app/irrigation/widgets/irrigation_history_modal.dart';
 import 'package:ayni_mobile_app/irrigation/widgets/manual_irrigation_control_widget.dart';
@@ -8,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class IrrigationView extends StatefulWidget {
-  const IrrigationView({super.key});
+  final Crop crop;
+
+  const IrrigationView({super.key, required this.crop});
 
   @override
   State<IrrigationView> createState() => _IrrigationViewState();
@@ -145,7 +148,7 @@ class _IrrigationViewState extends State<IrrigationView> {
           backgroundColor: colors["color-light-green"],
           toolbarHeight: 70,
           title: Text(
-            "Crop 1",
+            widget.crop.name,
             style: TextStyle(
               color: colors["color-text-black"],
               fontSize: 22,
