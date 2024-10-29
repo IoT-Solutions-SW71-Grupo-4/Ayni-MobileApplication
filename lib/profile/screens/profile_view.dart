@@ -93,7 +93,9 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
                 const Spacer(),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    context.goNamed("login_view");
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFFFFD9D9),
                     minimumSize: const Size(double.infinity, 50),

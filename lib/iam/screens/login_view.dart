@@ -32,7 +32,7 @@ class _LoginViewState extends State<LoginView> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      print("Login successful");
+      context.goNamed("home_view");
     }
   }
 
