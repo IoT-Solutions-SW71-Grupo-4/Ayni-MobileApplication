@@ -1,3 +1,4 @@
+import 'package:ayni_mobile_app/home/models/crop.dart';
 import 'package:ayni_mobile_app/home/screens/home_view.dart';
 import 'package:ayni_mobile_app/iam/screens/login_view.dart';
 import 'package:ayni_mobile_app/iam/screens/register_view.dart';
@@ -29,9 +30,13 @@ final routes = GoRouter(
       builder: (context, state) => const ProfileView(),
     ),
     GoRoute(
-      path: '/home/irrigation',
+      path: '/home/irrigation/:id',
       name: "irrigation_view",
-      builder: (context, state) => const IrrigationView(),
+      builder: (context, state) {
+        final id = state.pathParameters["id"]!;
+        final crop = state.extra as Crop;
+        return IrrigationView(crop: crop);
+      },
     )
   ],
 );
