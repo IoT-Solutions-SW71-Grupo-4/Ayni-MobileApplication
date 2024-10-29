@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:ayni_mobile_app/irrigation/widgets/automatic_irrigation_control_widget.dart';
 import 'package:ayni_mobile_app/irrigation/widgets/irrigation_history_modal.dart';

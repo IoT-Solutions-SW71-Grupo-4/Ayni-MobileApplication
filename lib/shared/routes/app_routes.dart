@@ -1,6 +1,7 @@
 import 'package:ayni_mobile_app/home/screens/home_view.dart';
 import 'package:ayni_mobile_app/iam/screens/login_view.dart';
 import 'package:ayni_mobile_app/iam/screens/register_view.dart';
+import 'package:ayni_mobile_app/irrigation/screens/irrigation_view.dart';
 import 'package:ayni_mobile_app/profile/screens/profile_view.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,6 +27,11 @@ final routes = GoRouter(
       path: '/profile',
       name: "profile_view",
       builder: (context, state) => const ProfileView(),
+    ),
+    GoRoute(
+      path: '/home/irrigation',
+      name: "irrigation_view",
+      builder: (context, state) => const IrrigationView(),
     )
   ],
 );

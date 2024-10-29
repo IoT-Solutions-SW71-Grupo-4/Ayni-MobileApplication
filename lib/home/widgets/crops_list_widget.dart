@@ -1,6 +1,7 @@
 import 'package:ayni_mobile_app/home/widgets/new_crop_modal.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CropsListWidget extends StatefulWidget {
   const CropsListWidget({super.key});
@@ -20,7 +21,7 @@ class _CropsListWidgetState extends State<CropsListWidget> {
   ];
 
   void _navigateToCropDetails(String cropName) {
-    print("Going to " + cropName + " screen...");
+    context.goNamed("irrigation_view");
   }
 
   void _displayAddCropForm() {
