@@ -1,8 +1,14 @@
+import 'package:ayni_mobile_app/home/models/weather.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
+import 'package:ayni_mobile_app/shared/utils/temperature_features.dart';
 import 'package:flutter/material.dart';
 
 class WeatherWidget extends StatefulWidget {
-  const WeatherWidget({super.key});
+  final Weather weatherDescription;
+  const WeatherWidget({
+    super.key,
+    required this.weatherDescription,
+  });
 
   @override
   State<WeatherWidget> createState() => _WeatherWidgetState();
@@ -35,15 +41,16 @@ class _WeatherWidgetState extends State<WeatherWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "20°",
+                TemperatureFeatures.toStringFromKelvinToCelcius(
+                    widget.weatherDescription.temperature),
                 style: TextStyle(
-                  fontSize: 44,
+                  fontSize: 40,
                   fontWeight: FontWeight.w900,
                   color: colors["color-text-black"],
                 ),
               ),
               Text(
-                "Lima, Perú",
+                "${widget.weatherDescription.city.name}, ${widget.weatherDescription.city.countryCode}",
                 style: TextStyle(
                   fontSize: 14,
                   color: colors["color-text-black"],
@@ -57,11 +64,11 @@ class _WeatherWidgetState extends State<WeatherWidget> {
                 height: 84,
                 width: 84,
                 child: Image.asset(
-                  "assets/images/weather_icons/04d.png",
+                  "assets/images/weather_icons/${widget.weatherDescription.iconId}.png",
                 ),
               ),
               Text(
-                "Cloudy",
+                widget.weatherDescription.description,
                 style: TextStyle(
                   fontSize: 14,
                   color: colors["color-text-black"],

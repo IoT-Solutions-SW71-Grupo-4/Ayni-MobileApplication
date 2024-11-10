@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+    compileSdkVersion 34
     namespace = "com.example.ayni_mobile_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
