@@ -4,7 +4,6 @@ import 'package:ayni_mobile_app/home/widgets/crops_list_widget.dart';
 import 'package:ayni_mobile_app/home/widgets/weather_widget.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeView extends StatefulWidget {
@@ -41,6 +40,7 @@ class _HomeViewState extends State<HomeView> {
     return [cropsData, weatherData];
   }
 
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: true,

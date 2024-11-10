@@ -1,10 +1,10 @@
-import 'package:ayni_mobile_app/home/models/weather_response.dart';
+import 'package:ayni_mobile_app/home/models/weather.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:ayni_mobile_app/shared/utils/temperature_features.dart';
 import 'package:flutter/material.dart';
 
 class WeatherWidget extends StatefulWidget {
-  final WeatherResponse weatherDescription;
+  final Weather weatherDescription;
   const WeatherWidget({
     super.key,
     required this.weatherDescription,
@@ -50,7 +50,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
                 ),
               ),
               Text(
-                "Lima, Perú",
+                "${widget.weatherDescription.city.name}, ${widget.weatherDescription.city.countryCode}",
                 style: TextStyle(
                   fontSize: 14,
                   color: colors["color-text-black"],
