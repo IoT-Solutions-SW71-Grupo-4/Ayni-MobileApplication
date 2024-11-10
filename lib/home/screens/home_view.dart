@@ -1,8 +1,10 @@
 import 'package:ayni_mobile_app/home/models/crop.dart';
+import 'package:ayni_mobile_app/home/services/weather_api_service.dart';
 import 'package:ayni_mobile_app/home/widgets/crops_list_widget.dart';
 import 'package:ayni_mobile_app/home/widgets/weather_widget.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeView extends StatefulWidget {
@@ -13,6 +15,8 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  final WeatherApiService _weatherApiService = WeatherApiService();
+
   Future<List<Crop>> fetchCrops() async {
     // Simulate API call
     final response = await Future.delayed(Duration(seconds: 1), () {
@@ -31,13 +35,18 @@ class _HomeViewState extends State<HomeView> {
     return response.map<Crop>((json) => Crop.fromJson(json)).toList();
   }
 
-  @override
+  Future<dynamic> getData() async {
+    final cropsData = await fetchCrops();
+    final weatherData = await _weatherApiService.getWeather();
+    return [cropsData, weatherData];
+  }
+
   Widget build(BuildContext context) {
     return SafeArea(
       top: true,
       child: Scaffold(
         body: FutureBuilder(
-          future: fetchCrops(),
+          future: getData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -47,7 +56,8 @@ class _HomeViewState extends State<HomeView> {
               return Center(child: Text('No crops found.'));
             }
 
-            final crops = snapshot.data!;
+            final crops = snapshot.data[0];
+            final weather = snapshot.data![1];
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -106,7 +116,9 @@ class _HomeViewState extends State<HomeView> {
                   const SizedBox(
                     height: 24,
                   ),
-                  const WeatherWidget(),
+                  WeatherWidget(
+                    weatherDescription: weather,
+                  ),
                   const SizedBox(
                     height: 24,
                   ),
