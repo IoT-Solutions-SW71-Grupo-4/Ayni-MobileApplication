@@ -4,6 +4,9 @@ import 'package:ayni_mobile_app/iam/widgets/password_text_field_widget.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../services/sign_up_service.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -18,25 +21,30 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _lastnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _areTermsAccepted = false;
 
+  // Lista de roles y rol seleccionado
+  final List<String> _roles = ["ROLE_USER", "ROLE_ADMIN"];
+  String? _selectedRole;
+
+  // Valida si el formulario es válido
+  bool get _isFormValid {
+    return _areTermsAccepted &&
+        _selectedRole != null &&
+        _formKey.currentState?.validate() == true;
+  }
+
+  // Validadores
   String? _validatePersonalData(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a valid name.';
-    }
-    if (value.length < 3) {
-      return 'Name must be at least 3 characters.';
-    }
+    if (value == null || value.isEmpty) return 'Please enter a valid name.';
+    if (value.length < 3) return 'Name must be at least 3 characters.';
     return null;
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
+    if (value == null || value.isEmpty) return 'Please enter your email';
     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
       return 'Enter a valid email address';
     }
@@ -44,19 +52,57 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   String? _confirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
-    }
+    if (value == null || value.isEmpty) return 'Please confirm your password';
     if (value != _passwordController.text) {
       return "Please, confirm your password correctly";
     }
     return null;
   }
 
-  void _submitForm() {
+  // Método para enviar el formulario
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      print("Register successful");
+      final signUpService = SignUpService();
+      try {
+        final errorMessage = await signUpService.signUp(
+          "${_firstNameController.text} ${_lastnameController.text}",
+          _emailController.text,
+          _passwordController.text,
+          [_selectedRole!],
+        );
+
+        if (errorMessage == null) {
+          Fluttertoast.showToast(
+            msg: "Registration successful!",
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+          context.goNamed("login_view");
+        } else {
+          _showErrorDialog(errorMessage); // Muestra el mensaje específico
+        }
+      } catch (error) {
+        _showErrorDialog("An unexpected error occurred. Please try again.");
+      }
     }
+  }
+
+
+  // Diálogo de error
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Error"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -81,25 +127,20 @@ class _RegisterViewState extends State<RegisterView> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
-                      color: colors["color-main-green"],
+                      color: colors["color-main-green"] ?? Colors.green,
                     ),
                   ),
                 ),
                 Form(
                   key: _formKey,
                   child: SizedBox(
-                    height: 560,
+                    height: 700,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         AuthTextFieldWidget(
                           controller: _firstNameController,
                           labelText: "First name",
-                          validator: _validatePersonalData,
-                        ),
-                        AuthTextFieldWidget(
-                          controller: _lastnameController,
-                          labelText: "Lastname",
                           validator: _validatePersonalData,
                         ),
                         AuthTextFieldWidget(
@@ -116,6 +157,37 @@ class _RegisterViewState extends State<RegisterView> {
                           labelText: "Confirm password",
                           validator: _confirmPassword,
                         ),
+                        DropdownButtonFormField<String>(
+                          value: _selectedRole,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedRole = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            labelText: "Select role",
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: colors["color-main-green"] ?? Colors.green,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: colors["color-main-green"] ?? Colors.green,
+                              ),
+                            ),
+                          ),
+                          items: _roles
+                              .map((role) => DropdownMenuItem<String>(
+                            value: role,
+                            child: Text(role),
+                          ))
+                              .toList(),
+                          validator: (value) =>
+                          value == null ? 'Please select a role' : null,
+                        ),
                         CheckboxWidget(
                           value: _areTermsAccepted,
                           onChanged: (bool? val) {
@@ -126,9 +198,10 @@ class _RegisterViewState extends State<RegisterView> {
                           text: "I agree with Ayni's Terms & Conditions",
                         ),
                         ElevatedButton(
-                          onPressed: _areTermsAccepted ? _submitForm : null,
+                          onPressed: _isFormValid ? _submitForm : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: colors["color-main-green"],
+                            backgroundColor:
+                            colors["color-main-green"] ?? Colors.green,
                             padding: const EdgeInsets.symmetric(vertical: 16.0),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
@@ -141,7 +214,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: colors["color-white"],
+                                  color: colors["color-white"] ?? Colors.white,
                                 ),
                               ),
                             ),
@@ -150,99 +223,6 @@ class _RegisterViewState extends State<RegisterView> {
                       ],
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 1, // Altura de la línea
-                          color: Colors.grey, // Color de la línea
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.0), // Espacio alrededor del texto
-                        child: Text(
-                          'or',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF121212), // Color del texto
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: 1, // Altura de la línea
-                          color: Colors.grey, // Color de la línea
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colors["color-light-green"],
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                'assets/images/google-logo.png',
-                                height: 22,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                "Sign up using Gmail",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: colors["color-black"],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "Do you have an account?",
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colors["color-50-black"],
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              context.goNamed("login_view");
-                            },
-                            child: Text(
-                              "Log in",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: colors["color-50-black"],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
