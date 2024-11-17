@@ -5,6 +5,8 @@ import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../services/sign_in_service.dart';
+
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -30,9 +32,28 @@ class _LoginViewState extends State<LoginView> {
     return null; // Si es válido, devuelve null
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      context.goNamed("home_view");
+      final signInService = SignInService();
+      final isSuccess = await signInService.signIn(_emailController.text, _passwordController.text);
+
+      if (isSuccess) {
+        context.goNamed("home_view");
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Error"),
+            content: Text("Invalid credentials"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
