@@ -2,8 +2,11 @@ import 'package:ayni_mobile_app/home/models/crop.dart';
 import 'package:ayni_mobile_app/home/services/weather_api_service.dart';
 import 'package:ayni_mobile_app/home/widgets/crops_list_widget.dart';
 import 'package:ayni_mobile_app/home/widgets/weather_widget.dart';
+import 'package:ayni_mobile_app/profile/models/farmer_model.dart';
+import 'package:ayni_mobile_app/profile/services/farmer_service.dart';
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeView extends StatefulWidget {
@@ -15,54 +18,65 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final WeatherApiService _weatherApiService = WeatherApiService();
+  final FarmerService _farmerService = FarmerService();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  String? token;
+
+  Future<dynamic> getData() async {
+    // Recupera el token almacenado
+    final token = await _storage.read(key: 'token');
+    // Recupera el ID del Farmer almacenado
+    final farmerId = await _storage.read(key: 'id');
+
+    if (token == null || farmerId == null) {
+      throw Exception("Token or Farmer ID is missing. Please log in again.");
+    }
+
+    // Solicita los datos del Farmer usando el ID y el token
+    final farmer = await _farmerService.getFarmerById(int.parse(farmerId)); // ID dinámico
+    final weatherData = await _weatherApiService.getWeather();
+    final cropsData = await fetchCrops();
+
+    return [farmer, weatherData, cropsData];
+  }
+
 
   Future<List<Crop>> fetchCrops() async {
-    // Simulate API call
-    final response = await Future.delayed(Duration(seconds: 1), () {
+    // Simula una llamada a la API de cultivos
+    final response = await Future.delayed(const Duration(seconds: 1), () {
       return [
-        {
-          "id": 1,
-          "name": "Wheat",
-        },
-        {
-          "id": 2,
-          "name": "Corn",
-        },
+        {"id": 1, "name": "Wheat"},
+        {"id": 2, "name": "Corn"},
       ];
     });
 
     return response.map<Crop>((json) => Crop.fromJson(json)).toList();
   }
 
-  Future<dynamic> getData() async {
-    final cropsData = await fetchCrops();
-    final weatherData = await _weatherApiService.getWeather();
-    return [cropsData, weatherData];
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: true,
       child: Scaffold(
         body: FutureBuilder(
           future: getData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('No crops found.'));
+              return const Center(child: Text('No data found.'));
             }
 
-            final crops = snapshot.data[0];
+            // Obtiene los datos recuperados
+            final farmer = snapshot.data![0] as Farmer;
             final weather = snapshot.data![1];
+            final crops = snapshot.data![2] as List<Crop>;
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
@@ -106,22 +120,18 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                   Text(
-                    "Welcome, Aaron",
+                    "Welcome, ${farmer.username}",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: colors["color-black"],
                     ),
                   ),
-                  const SizedBox(
-                    height: 24,
-                  ),
+                  const SizedBox(height: 24),
                   WeatherWidget(
                     weatherDescription: weather,
                   ),
-                  const SizedBox(
-                    height: 24,
-                  ),
+                  const SizedBox(height: 24),
                   CropsListWidget(cropsList: crops),
                 ],
               ),
