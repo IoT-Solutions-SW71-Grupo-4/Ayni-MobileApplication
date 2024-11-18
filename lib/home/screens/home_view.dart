@@ -111,8 +111,19 @@ class _HomeViewState extends State<HomeView> {
                               Icons.person,
                               color: colors["color-50-black"],
                             ),
-                            onPressed: () {
-                              context.goNamed("profile_view");
+                            onPressed: () async {
+                              final farmerId = await _storage.read(key: 'id');
+
+                              if (farmerId != null) {
+                                context.goNamed(
+                                  "profile_view",
+                                  pathParameters: {"id": farmerId},
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Error: Farmer ID is missing.')),
+                                );
+                              }
                             },
                           ),
                         ),
