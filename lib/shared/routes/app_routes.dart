@@ -35,7 +35,7 @@ final routes = GoRouter(
     ),
     GoRoute(
       path: '/farmer/:id',
-      name: "profile_view",
+      name: "profile_view", // Este nombre coincide con el usado en context.goNamed
       builder: (context, state) {
         final id = int.parse(state.pathParameters["id"]!); // Obtiene el ID dinámico del Farmer
         return FarmerScreen(farmerId: id); // Pasa el ID al FarmerScreen

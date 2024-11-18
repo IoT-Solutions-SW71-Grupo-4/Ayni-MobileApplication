@@ -41,6 +41,31 @@ class BaseService {
     return _handleResponse(response);
   }
 
+  // metodo para subir foto
+  Future<dynamic> uploadFile(
+      String endpoint, String fieldName, String filePath,
+      {String method = 'POST'}) async {
+    final headers = await _getHeaders(); // Obtener headers con token
+    final uri = Uri.parse('$baseUrl/$endpoint');
+
+    final request = http.MultipartRequest(method, uri); // Usamos el método dinámico
+    request.headers.addAll(headers);
+
+    // Agregar el archivo
+    final file = await http.MultipartFile.fromPath(fieldName, filePath);
+    request.files.add(file);
+
+    // Ejecutar la solicitud
+    final response = await request.send();
+    final responseBody = await response.stream.bytesToString();
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return jsonDecode(responseBody);
+    } else {
+      throw Exception('HTTP Error: ${response.statusCode}, ${responseBody}');
+    }
+  }
+
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body);
