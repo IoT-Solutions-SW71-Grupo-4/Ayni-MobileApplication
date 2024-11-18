@@ -20,41 +20,64 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isCheckedRememberMe = false;
+  bool _isLoading = false;
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
-    // Verificar formato de correo electrónico
     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
       return 'Enter a valid email address';
     }
-    return null; // Si es válido, devuelve null
+    return null;
   }
 
-  void _submitForm() async {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      final signInService = SignInService();
-      final isSuccess = await signInService.signIn(_emailController.text, _passwordController.text);
+      setState(() {
+        _isLoading = true;
+      });
 
-      if (isSuccess) {
-        context.goNamed("home_view");
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Error"),
-            content: Text("Invalid credentials"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text("OK"),
-              ),
-            ],
-          ),
+      final signInService = SignInService();
+
+      try {
+        final success = await signInService.signIn(
+          _emailController.text,
+          _passwordController.text,
         );
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (success) {
+          context.goNamed("home_view");
+        } else {
+          _showErrorDialog("Invalid credentials. Please try again.");
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorDialog("An error occurred: ${e.toString()}");
       }
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Error"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -67,14 +90,14 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 100,
                 child: Text(
                   "Login",
                   style: TextStyle(
                     fontSize: 38,
                     fontWeight: FontWeight.w900,
-                    color: colors["color-main-green"],
+                    color: Colors.green, // Usa el color definido para el tema
                   ),
                 ),
               ),
@@ -108,15 +131,17 @@ class _LoginViewState extends State<LoginView> {
                       },
                       text: "Remember me",
                     ),
-                    ElevatedButton(
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
                       onPressed: _submitForm,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: colors["color-main-green"],
+                        backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: SizedBox(
+                      child: const SizedBox(
                         width: double.infinity,
                         child: Center(
                           child: Text(
@@ -124,19 +149,19 @@ class _LoginViewState extends State<LoginView> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: colors["color-white"],
+                              color: Colors.white,
                             ),
                           ),
                         ),
                       ),
                     ),
                     TextButton(
-                      onPressed: () => {},
-                      child: Text(
+                      onPressed: () => {}, // Agregar lógica de "Forgot password"
+                      child: const Text(
                         "Forgot password?",
                         style: TextStyle(
                           fontSize: 13,
-                          color: colors["color-50-black"],
+                          color: Colors.black, // Color del texto del botón
                         ),
                       ),
                     ),
@@ -160,7 +185,7 @@ class _LoginViewState extends State<LoginView> {
                         'or',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xFF121212), // Color del texto
+                          color: Colors.black,
                         ),
                       ),
                     ),
@@ -176,9 +201,9 @@ class _LoginViewState extends State<LoginView> {
               Column(
                 children: [
                   ElevatedButton(
-                    onPressed: () => {},
+                    onPressed: () => {}, // Agregar lógica para Gmail Login
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: colors["color-light-green"],
+                      backgroundColor: Colors.lightGreen,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
@@ -194,12 +219,12 @@ class _LoginViewState extends State<LoginView> {
                               height: 22,
                             ),
                             const SizedBox(width: 10),
-                            Text(
+                            const Text(
                               "Log in using Gmail",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
-                                color: colors["color-black"],
+                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -212,22 +237,22 @@ class _LoginViewState extends State<LoginView> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
+                        const Text(
                           "Don't you have an account?",
                           style: TextStyle(
                             fontSize: 13,
-                            color: colors["color-50-black"],
+                            color: Colors.black,
                           ),
                         ),
                         TextButton(
                           onPressed: () {
                             context.goNamed("register_view");
                           },
-                          child: Text(
+                          child: const Text(
                             "Register",
                             style: TextStyle(
                               fontSize: 13,
-                              color: colors["color-50-black"],
+                              color: Colors.black,
                             ),
                           ),
                         )
