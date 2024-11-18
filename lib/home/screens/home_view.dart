@@ -8,6 +8,9 @@ import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ayni_mobile_app/home/widgets/new_crop_modal.dart';
+
+import '../../crop/services/crop_service.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -19,9 +22,11 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final WeatherApiService _weatherApiService = WeatherApiService();
   final FarmerService _farmerService = FarmerService();
+  final CropService _cropService = CropService();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   String? token;
+  List<Crop> crops = [];
 
   Future<dynamic> getData() async {
     // Recupera el token almacenado
@@ -36,22 +41,52 @@ class _HomeViewState extends State<HomeView> {
     // Solicita los datos del Farmer usando el ID y el token
     final farmer = await _farmerService.getFarmerById(int.parse(farmerId)); // ID dinámico
     final weatherData = await _weatherApiService.getWeather();
-    final cropsData = await fetchCrops();
+    final cropsData = await fetchCrops(int.parse(farmerId));
 
     return [farmer, weatherData, cropsData];
   }
 
+  Future<List<Crop>> fetchCrops(int farmerId) async {
+    // Llama al servicio de cultivos para obtener la lista
+    return await _cropService.getCropsByFarmerId(farmerId);
+  }
 
-  Future<List<Crop>> fetchCrops() async {
-    // Simula una llamada a la API de cultivos
-    final response = await Future.delayed(const Duration(seconds: 1), () {
-      return [
-        {"id": 1, "name": "Wheat"},
-        {"id": 2, "name": "Corn"},
-      ];
+  Future<void> _displayAddCropForm() async {
+    final result = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (context) => const AddCropModal(),
+    );
+
+    if (result == true) {
+      // Recupera el ID del Farmer almacenado
+      final farmerId = await _storage.read(key: 'id');
+      if (farmerId != null) {
+        // Refresca la lista de cultivos después de agregar uno nuevo
+        final updatedCrops = await fetchCrops(int.parse(farmerId));
+        setState(() {
+          crops = updatedCrops;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Inicializa la lista de cultivos
+    _storage.read(key: 'id').then((farmerId) {
+      if (farmerId != null) {
+        fetchCrops(int.parse(farmerId)).then((data) {
+          setState(() {
+            crops = data;
+          });
+        });
+      }
     });
-
-    return response.map<Crop>((json) => Crop.fromJson(json)).toList();
   }
 
   @override
@@ -143,7 +178,16 @@ class _HomeViewState extends State<HomeView> {
                     weatherDescription: weather,
                   ),
                   const SizedBox(height: 24),
-                  CropsListWidget(cropsList: crops),
+                  CropsListWidget(
+                    cropsList: crops,
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: FloatingActionButton(
+                      onPressed: _displayAddCropForm,
+                      child: const Icon(Icons.add),
+                    ),
+                  ),
                 ],
               ),
             );

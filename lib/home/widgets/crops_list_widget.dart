@@ -18,8 +18,8 @@ class _CropsListWidgetState extends State<CropsListWidget> {
     context.go("/home/irrigation/${crop.id}", extra: crop);
   }
 
-  void _displayAddCropForm() {
-    showModalBottomSheet(
+  void _displayAddCropForm() async {
+    final result = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -27,6 +27,12 @@ class _CropsListWidgetState extends State<CropsListWidget> {
       ),
       builder: (context) => const AddCropModal(),
     );
+
+    if (result == true) {
+      setState(() {
+        // Actualiza la lista de cultivos (puedes implementar fetchCrops aquí)
+      });
+    }
   }
 
   @override
@@ -78,8 +84,16 @@ class _CropsListWidgetState extends State<CropsListWidget> {
                   );
                 } else {
                   return CropCardWidget(
-                    crop: Crop(id: 999, name: "Add crop"),
-                    onTap: () => _displayAddCropForm(),
+                  crop: Crop(
+                    id: 999,
+                    cropName: "Add crop",
+                    irrigationType: "",
+                    area: 0,
+                    plantingDate: "",
+                    farmerId: 0,
+                    imageUrl: "",
+                  ).copyWith(cropName: "New Crop Name"),
+                  onTap: () => _displayAddCropForm(),
                   );
                 }
               },
@@ -111,36 +125,37 @@ class CropCardWidget extends StatelessWidget {
         ),
         color: colors["color-light-green"],
         elevation: 2,
-        child: SizedBox(
-          height: 156,
-          width: 156,
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                  height: 72,
-                  width: 72,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colors["color-white"],
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(50),
-                      ),
-                    ),
-                  ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            // Imagen del cultivo
+            ClipOval(
+              child: crop.imageUrl.isNotEmpty
+                  ? Image.network(
+                crop.imageUrl,
+                height: 72,
+                width: 72,
+                fit: BoxFit.cover,
+              )
+                  : Container(
+                height: 72,
+                width: 72,
+                color: colors["color-white"],
+                child: const Icon(
+                  Icons.image_not_supported,
+                  color: Colors.grey,
                 ),
-                Text(
-                  crop.name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            // Nombre del cultivo
+            Text(
+              crop.cropName,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );

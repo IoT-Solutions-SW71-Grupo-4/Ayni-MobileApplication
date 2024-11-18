@@ -45,7 +45,7 @@ class BaseService {
   Future<dynamic> uploadFile(
       String endpoint, String fieldName, String filePath,
       {String method = 'POST'}) async {
-    final headers = await _getHeaders(); // Obtener headers con token
+    final headers = await _getHeaders(); // obrtgno headers con token
     final uri = Uri.parse('$baseUrl/$endpoint');
 
     final request = http.MultipartRequest(method, uri); // Usamos el método dinámico
@@ -65,6 +65,35 @@ class BaseService {
       throw Exception('HTTP Error: ${response.statusCode}, ${responseBody}');
     }
   }
+
+  // metodo para subir foto y datos (crops)
+  Future<dynamic> postMultipart(String endpoint, Map<String, String> fields, String? filePath) async {
+    final headers = await _getHeaders();
+    final uri = Uri.parse('$baseUrl/$endpoint');
+    final request = http.MultipartRequest('POST', uri);
+
+    // Añadir el JSON como una parte llamada "crop"
+    final cropJson = jsonEncode(fields);
+    request.fields['crop'] = cropJson;
+
+    // Adjuntar el archivo si existe
+    if (filePath != null) {
+      final file = await http.MultipartFile.fromPath('file', filePath);
+      request.files.add(file);
+    }
+
+    request.headers.addAll(headers);
+
+    final response = await request.send();
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return jsonDecode(await response.stream.bytesToString());
+    } else {
+      throw Exception(
+        'HTTP Error: ${response.statusCode}, ${await response.stream.bytesToString()}',
+      );
+    }
+  }
+
 
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {

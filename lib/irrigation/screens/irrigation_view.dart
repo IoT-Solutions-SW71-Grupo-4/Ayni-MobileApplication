@@ -148,7 +148,7 @@ class _IrrigationViewState extends State<IrrigationView> {
           backgroundColor: colors["color-light-green"],
           toolbarHeight: 70,
           title: Text(
-            widget.crop.name,
+            widget.crop.cropName,
             style: TextStyle(
               color: colors["color-text-black"],
               fontSize: 22,

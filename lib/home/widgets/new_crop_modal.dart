@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:ayni_mobile_app/shared/utils/colors.dart';
 import 'package:ayni_mobile_app/shared/widgets/text_fields/date_field_widget.dart';
 import 'package:ayni_mobile_app/shared/widgets/text_fields/number_field_widget.dart';
 import 'package:ayni_mobile_app/shared/widgets/text_fields/string_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../crop/services/crop_service.dart';
+
 
 class AddCropModal extends StatefulWidget {
   const AddCropModal({super.key});
@@ -12,10 +18,15 @@ class AddCropModal extends StatefulWidget {
 }
 
 class _AddCropModalState extends State<AddCropModal> {
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _cropNameController = TextEditingController();
   final TextEditingController _areaController = TextEditingController();
   final TextEditingController _plantingDateController = TextEditingController();
+
+  final CropService _cropService = CropService();
+  File? _selectedImage;
+  String _irrigationType = "Manual"; // Default irrigation type
 
   String? _validateCropName(String? value) {
     if (value == null || value.isEmpty) {
@@ -56,12 +67,51 @@ class _AddCropModalState extends State<AddCropModal> {
     return null;
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.of(context).pop();
-      showSuccessBottomSheet(context);
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path); // Asigna el archivo seleccionado
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an image.')),
+      );
     }
   }
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select an image.')),
+        );
+        return;
+      }
+
+      try {
+        // Llama al servicio para crear el cultivo
+        await _cropService.createCrop(
+          cropName: _cropNameController.text,
+          irrigationType: _irrigationType,
+          area: int.parse(_areaController.text),
+          plantingDate: _plantingDateController.text,
+          farmerId: int.parse((await _storage.read(key: 'id'))!),
+          imagePath: _selectedImage!.path,
+        );
+
+        Navigator.of(context).pop(); // Cierra el modal
+        showSuccessBottomSheet(context); // Muestra la confirmación
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add crop: $error')),
+        );
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +141,20 @@ class _AddCropModalState extends State<AddCropModal> {
                   validator: _validateCropName,
                 ),
                 const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: _irrigationType,
+                  items: const [
+                    DropdownMenuItem(value: "Manual", child: Text("Manual")),
+                    DropdownMenuItem(value: "Automatic", child: Text("Automatic")),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _irrigationType = value!;
+                    });
+                  },
+                  decoration: const InputDecoration(labelText: "Irrigation Type"),
+                ),
+                const SizedBox(height: 20),
                 NumberFieldWidget(
                   controller: _areaController,
                   labelText: "Area (Hectares)",
@@ -101,6 +165,28 @@ class _AddCropModalState extends State<AddCropModal> {
                   controller: _plantingDateController,
                   labelText: "Planting date",
                   validator: _validatePlantingDate,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    _selectedImage != null
+                        ? Image.file(
+                      _selectedImage!,
+                      height: 80,
+                      width: 80,
+                      fit: BoxFit.cover,
+                    )
+                        : const Text("No image selected"),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colors["color-main-green"],
+                        foregroundColor: colors["color-white"],
+                      ),
+                      child: const Text("Select Image"),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
